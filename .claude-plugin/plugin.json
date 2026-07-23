@@ -1,0 +1,10 @@
+{
+  "name": "crossplane-contributor",
+  "description": "Guidance for contributing code to crossplane/crossplane or any crossplane-contrib provider: commit hygiene, DCO sign-off, PR structure, coding style, and provider-specific API/controller conventions.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jens Hausherr",
+    "url": "https://github.com/jabbrwcky"
+  },
+  "license": "Apache-2.0"
+}

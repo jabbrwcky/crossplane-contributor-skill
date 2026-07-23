@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "crossplane-contributor-skill",
+  "description": "A marketplace hosting the crossplane-contributor skill: guidance for contributing to crossplane/crossplane and crossplane-contrib provider repositories.",
+  "owner": {
+    "name": "Jens Hausherr",
+    "url": "https://github.com/jabbrwcky"
+  },
+  "plugins": [
+    {
+      "name": "crossplane-contributor",
+      "description": "Guidance for contributing code to crossplane/crossplane or any crossplane-contrib provider: commit hygiene, DCO sign-off, PR structure, coding style, and provider-specific API/controller conventions.",
+      "source": "./",
+      "category": "development"
+    }
+  ]
+}
