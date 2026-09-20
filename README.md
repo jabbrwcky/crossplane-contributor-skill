@@ -43,7 +43,7 @@ Bump `version` in `.claude-plugin/plugin.json` and push to `main`. CI takes it f
 
 For Claude.ai, grab the `.skill` file from the release assets and upload it (there's no auto-update path there).
 
-**Repo setup**: `tag-version.yml` pushes the tag with a PAT stored in the `RELEASE_TOKEN` secret, not the default `GITHUB_TOKEN` — tags pushed with the default token don't trigger other workflows, so `release.yml`'s tag-push trigger wouldn't fire. Add a PAT (fine-grained, `Contents: Read and write` on this repo) as a repository secret named `RELEASE_TOKEN`.
+**Repo setup**: `tag-version.yml` pushes the tag with a PAT stored in the `RELEASE_TOKEN` secret, not the default `GITHUB_TOKEN` (tags pushed with the default token don't trigger other workflows), and then explicitly dispatches `release.yml` via the API rather than relying on its `push: tags` trigger firing on its own (that trigger is unreliable for tags created by a workflow). Add a fine-grained PAT with `Contents: Read and write` **and** `Actions: Read and write` on this repo as a repository secret named `RELEASE_TOKEN`.
 
 ## License
 
