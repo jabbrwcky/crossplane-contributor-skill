@@ -1,0 +1,56 @@
+name: Tag version bump
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .claude-plugin/plugin.json
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Detect version change
+        id: version
+        run: |
+          new_version="$(jq -r '.version' .claude-plugin/plugin.json)"
+          old_version=""
+          if git cat-file -e "${{ github.event.before }}" 2>/dev/null; then
+            old_version="$(git show "${{ github.event.before }}:.claude-plugin/plugin.json" 2>/dev/null | jq -r '.version // empty')"
+          fi
+          echo "new=$new_version" >> "$GITHUB_OUTPUT"
+          if [ -n "$new_version" ] && [ "$new_version" != "$old_version" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and push tag
+        if: steps.version.outputs.changed == 'true'
+        env:
+          TAG: v${{ steps.version.outputs.new }}
+          # A PAT with contents:write is required here (not GITHUB_TOKEN): tags
+          # pushed with the default token don't trigger other workflows, which
+          # would prevent release.yml's tag-push trigger from firing.
+          GIT_PUSH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG already exists, skipping."
+            exit 0
+          fi
+          if [ -z "$GIT_PUSH_TOKEN" ]; then
+            echo "::error::secrets.RELEASE_TOKEN is not set. Add a PAT with contents:write so the pushed tag can trigger release.yml." >&2
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "$TAG"
+          git push "https://x-access-token:${GIT_PUSH_TOKEN}@github.com/${{ github.repository }}.git" "$TAG"
