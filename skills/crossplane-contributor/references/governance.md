@@ -11,9 +11,10 @@ must follow all the same rules and policies" as `crossplane` core.
 ## Two-tier governance
 
 - **Steering Committee** — org-wide, 5 seats, 2-year staggered terms,
-  elected by Condorcet/IRV vote. Only gets involved for changes with broad
-  cross-repo/architectural impact, or to bootstrap/veto in specific cases
-  below.
+  elected by Condorcet/IRV vote. No single organization (or conglomerate of
+  affiliated ones) may hold more than 2 seats. Only gets involved for
+  changes with broad cross-repo/architectural impact, or to bootstrap/veto
+  in specific cases below.
 - **Per-repo maintainer team** — each repo (including each
   crossplane-contrib provider) has its own maintainers, listed in that
   repo's `OWNERS.md`. Maintainers approve and merge their own repo's PRs,
@@ -35,7 +36,7 @@ must follow all the same rules and policies" as `crossplane` core.
 
 ## Build and release
 
-- Use the shared `upbound/build` submodule for a consistent Makefile-driven
+- Use the shared `crossplane/build` submodule for a consistent Makefile-driven
   build across the ecosystem, plus a Go linter config.
 - Package config lives at `package/crossplane.yaml`.
 - Providers generally follow Crossplane's own release process — most use
@@ -91,8 +92,9 @@ project.
 
 - Follow all CNCF policies and "project health" guidelines.
 - Keep the maintainer list synchronized in **three** places: the repo's
-  `OWNERS.md`, the CNCF `project-maintainers.csv`, and the
-  `cncf-crossplane-maintainers@lists.cncf.io` mailing list.
+  `OWNERS.md`, the GitHub team granting merge permissions on the repo, and
+  the central `crossplane/.project` maintainer list
+  (`maintainers.yaml`).
 - Keep the project's entry current in the public "Community Extension
   Projects" list on docs.crossplane.io.
 
