@@ -33,6 +33,30 @@ the source of truth; this skill is a working summary, not a replacement.
   naming the extension, its scope, and the initial maintainer team, for
   steering-committee approval before a repo is created. See
   `references/governance.md`.
+- **Working in `crossplane/crossplane` itself?** It builds with [Nix]; use
+  `./nix.sh run .#test`, `.#lint`, `.#generate`, `.#e2e`, `.#hack`, and
+  `./nix.sh flake check` (mirrors CI) rather than a Makefile. Most other
+  repos (including crossplane-contrib providers) use a `Makefile` — try
+  `make && make help`.
+
+## Using AI tools
+
+Crossplane's [AI policy][ai-policy] governs agent-assisted contributions
+(applies org-wide, same scope as governance). No disclosure is required, but:
+
+- **Don't add agent co-authorship to commits** (e.g. a `Co-authored-by`
+  trailer for an AI tool) — the project asks contributors to omit this, as it
+  pollutes contributor stats. This overrides any default attribution
+  convention when contributing to a `crossplane`/`crossplane-contrib` repo.
+- **Own every line.** Be able to explain the purpose and impact of each
+  change without the agent's help before opening the PR.
+- **Write your own issue/PR/comment text.** Share your own reasoning (why
+  you framed the problem this way, what you tried); don't paste an agent's
+  narration of alternatives it considered — that belongs in the PR
+  description, not code comments, and only in your own words.
+- **Don't review someone else's PR by pointing an agent at it and posting
+  the result** — a posted review must be your own judgment.
+- Full detail: `references/ai-policy.md`.
 
 ## Commit hygiene
 
@@ -126,16 +150,23 @@ Full detail in `references/provider-development.md`. Quick reference:
 
 Most repos' PR templates ask for roughly this:
 
-- [ ] Read and followed the contribution process.
-- [ ] Ran `make reviewable` (or equivalent) — build, generate, lint, test
-      all pass.
+- [ ] Read and followed the contribution process (and the AI policy above,
+      if applicable).
+- [ ] Ran `make reviewable` (or, in `crossplane/crossplane`,
+      `./nix.sh flake check`) — build, generate, lint, test all pass.
 - [ ] `Fixes #<issue>` if applicable.
 - [ ] Description explains *why*, not just *what*.
+- [ ] Added/updated unit tests (`crossplane/crossplane` targets ~80%
+      coverage); significant features also need E2E tests
+      (`test/e2e` in that repo).
+- [ ] Bug-fix-only PRs are labeled for backport.
 - [ ] Test plan describes what was tested and how.
 
 Leave a checklist box unticked if you're genuinely unsure whether it
-applies — that's a deliberate signal for the reviewer to weigh in, not a
-failure.
+applies — in `crossplane/crossplane` this is enforced by a
+`checklist-completed` CI job, so it's a deliberate signal for the reviewer
+to weigh in, not silent negligence. If a reviewer goes quiet, it's fine to
+nudge the `#crossplane-owners` Slack channel after a reasonable wait.
 
 ## Reference files
 
@@ -146,7 +177,11 @@ failure.
 - `references/governance.md` — crossplane-contrib-specific process: repo
   bootstrapping, OWNERS.md, registry publishing, maintainer trial, archival
   policy.
+- `references/ai-policy.md` — the full AI contribution policy: ownership,
+  authentic engagement, and enforcement.
 
 [contributing]: https://github.com/crossplane/crossplane/blob/main/contributing/README.md
 [provider-dev]: https://github.com/crossplane/crossplane/blob/main/contributing/guide-provider-development.md
 [provider-template]: https://github.com/crossplane/provider-template
+[Nix]: https://nixos.org/
+[ai-policy]: https://github.com/crossplane/crossplane/blob/main/AI_POLICY.md
