@@ -31,6 +31,8 @@ doesn't cover or that has since changed.
 - `skills/crossplane-contributor/references/governance.md` —
   crossplane-contrib-specific process: repo bootstrapping, `OWNERS.md`,
   registry publishing, maintainer trial, archival policy.
+- `skills/crossplane-contributor/references/ai-policy.md` — Crossplane's
+  AI contribution policy: ownership, authentic engagement, enforcement.
 
 ## License
 
