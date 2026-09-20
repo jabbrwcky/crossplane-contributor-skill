@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to release (e.g. v1.2.0)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref_name }}
+
+      - name: Build Claude.ai skill archive
+        run: |
+          mkdir -p dist
+          (cd skills && zip -rq -X "$GITHUB_WORKSPACE/dist/crossplane-contributor.skill" crossplane-contributor)
+
+      - name: Generate changelog
+        id: changelog
+        uses: orhun/git-cliff-action@v4.9.1
+        with:
+          config: cliff.toml
+          args: --latest --strip header
+
+      - name: Create release
+        uses: softprops/action-gh-release@v3.0.3
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: ${{ inputs.tag || github.ref_name }}
+          body: ${{ steps.changelog.outputs.content }}
+          files: dist/crossplane-contributor.skill

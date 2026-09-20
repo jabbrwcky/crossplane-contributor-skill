@@ -34,6 +34,17 @@ doesn't cover or that has since changed.
 - `skills/crossplane-contributor/references/ai-policy.md` — Crossplane's
   AI contribution policy: ownership, authentic engagement, enforcement.
 
+## Releasing
+
+Bump `version` in `.claude-plugin/plugin.json` and push to `main`. CI takes it from there:
+
+1. `tag-version.yml` detects the version change and pushes a `v<version>` tag.
+2. `release.yml` runs on that tag push, rebuilds `crossplane-contributor.skill` from the current `skills/crossplane-contributor/` sources, and publishes a GitHub Release with it attached and a changelog compiled from the conventional commits since the last tag.
+
+For Claude.ai, grab the `.skill` file from the release assets and upload it (there's no auto-update path there).
+
+**Repo setup**: `tag-version.yml` pushes the tag with a PAT stored in the `RELEASE_TOKEN` secret, not the default `GITHUB_TOKEN` — tags pushed with the default token don't trigger other workflows, so `release.yml`'s tag-push trigger wouldn't fire. Add a PAT (fine-grained, `Contents: Read and write` on this repo) as a repository secret named `RELEASE_TOKEN`.
+
 ## License
 
 Apache-2.0 — see [LICENSE](LICENSE).
