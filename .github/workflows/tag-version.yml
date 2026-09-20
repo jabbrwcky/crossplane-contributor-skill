@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   tag:
@@ -38,38 +39,31 @@ jobs:
         if: steps.version.outputs.changed == 'true'
         env:
           TAG: v${{ steps.version.outputs.new }}
-          # A PAT with contents:write is required here (not GITHUB_TOKEN): tags
-          # pushed with the default token don't trigger other workflows, which
-          # would prevent release.yml's tag-push trigger from firing.
-          GIT_PUSH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
             echo "Tag $TAG already exists, skipping."
             echo "created=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if [ -z "$GIT_PUSH_TOKEN" ]; then
-            echo "::error::secrets.RELEASE_TOKEN is not set. Add a PAT with contents:write." >&2
-            exit 1
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "$TAG" -m "$TAG"
-          git push "https://x-access-token:${GIT_PUSH_TOKEN}@github.com/${{ github.repository }}.git" "$TAG"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "$TAG"
           echo "created=true" >> "$GITHUB_OUTPUT"
 
-      # A tag pushed by a workflow (even with a PAT) unreliably triggers other
-      # workflows' `on: push: tags` — GitHub's handling of this varies by PAT
-      # type and isn't guaranteed. Dispatch release.yml explicitly instead of
-      # depending on that implicit trigger.
+      # Pushing the tag above won't itself trigger release.yml's `push: tags`
+      # event: GITHUB_TOKEN-authored events never start new workflow runs
+      # (to prevent recursion). workflow_dispatch is explicitly exempt from
+      # that restriction, so dispatch release.yml directly instead.
       - name: Dispatch release workflow
         if: steps.tag.outputs.created == 'true'
         env:
           TAG: v${{ steps.version.outputs.new }}
-          GIT_PUSH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           curl -sf -X POST \
-            -H "Authorization: Bearer ${GIT_PUSH_TOKEN}" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/release.yml/dispatches" \
             -d "{\"ref\":\"${TAG}\",\"inputs\":{\"tag\":\"${TAG}\"}}"
